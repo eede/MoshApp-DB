@@ -9,6 +9,7 @@ s_num VARCHAR(9) NOT NULL,
 UNIQUE (u_nicknme),
 UNIQUE (s_num)
 );
+INSERT INTO USERS(`u_nicknme`,`u_fname`,`u_lastname`,`u_email`,`u_phone`,`s_num`) values("TestUser","Test","Test","test@test.com","0000000000","000000000");
 
 /* Henuz eklenmedi */
 CREATE TABLE USER_OPTIONS{
@@ -21,21 +22,25 @@ UNIQUE (u_id)
 
 
 CREATE TABLE PERMISSIONS(
-p_id INT AUTO_INCREMENT PRIMARY KEY,
+p_id INT PRIMARY KEY,
 p_desc VARCHAR(100)
 );
+
+INSERT INTO PERMISSIONS values(0,"Regular user, can play game"),(1,"Master Admin, has all the power ower game and players."),(2,"Editor, can change add new tasks and teams"),
+(3,"Admin, has ability that editor can do plus able to ban users"),(4,"Banned User");
 
 
 CREATE TABLE LOGIN(
 login_name VARCHAR(30) NOT NULL,
 login_pass VARCHAR(34) NOT NULL,
 u_id INT,
-p_id INT,
+p_id INT DEFAULT 0,
 FOREIGN KEY (u_id) REFERENCES USERS(u_id),
 FOREIGN KEY (p_id) REFERENCES PERMISSIONS(p_id),
 UNIQUE (login_name),
 UNIQUE (u_id)
 );
+INSERT INTO LOGIN(`login_name`,`login_pass`,`u_id`) values("harme","123654","1");
 
 
 CREATE TABLE TEAMS(
