@@ -1,4 +1,4 @@
-CREATE TABLE USERS(
+CREATE TABLE users(
 u_id INT AUTO_INCREMENT PRIMARY KEY,
 u_nicknme VARCHAR(30) NOT NULL,
 u_fname VARCHAR(30),
@@ -9,41 +9,41 @@ s_num VARCHAR(9) NOT NULL,
 UNIQUE (u_nicknme),
 UNIQUE (s_num)
 );
-INSERT INTO USERS(`u_nicknme`,`u_fname`,`u_lastname`,`u_email`,`u_phone`,`s_num`) values("TestUser","Test","Test","test@test.com","0000000000","000000000");
+INSERT INTO users(`u_nicknme`,`u_fname`,`u_lastname`,`u_email`,`u_phone`,`s_num`) values("TestUser","Test","Test","test@test.com","0000000000","000000000");
 
 /* Henuz eklenmedi */
-CREATE TABLE USER_OPTIONS{
+CREATE TABLE user_options{
 u_id INT,
 p_vsbl_tm TINYINT(1),
 e_vsbl_tm TINYINT(1),
-FOREIGN KEY (u_id) REFERENCES USERS(u_id),
+FOREIGN KEY (u_id) REFERENCES users(u_id),
 UNIQUE (u_id)
 }
 
 
-CREATE TABLE PERMISSIONS(
+CREATE TABLE permissions(
 p_id INT PRIMARY KEY,
 p_desc VARCHAR(100)
 );
 
-INSERT INTO PERMISSIONS values(0,"Regular user, can play game"),(1,"Master Admin, has all the power ower game and players."),(2,"Editor, can change add new tasks and teams"),
+INSERT INTO permissions values(0,"Regular user, can play game"),(1,"Master Admin, has all the power ower game and players."),(2,"Editor, can change add new tasks and teams"),
 (3,"Admin, has ability that editor can do plus able to ban users"),(4,"Banned User");
 
 
-CREATE TABLE LOGIN(
+CREATE TABLE login(
 login_name VARCHAR(30) NOT NULL,
 login_pass VARCHAR(34) NOT NULL,
 u_id INT,
 p_id INT DEFAULT 0,
-FOREIGN KEY (u_id) REFERENCES USERS(u_id),
-FOREIGN KEY (p_id) REFERENCES PERMISSIONS(p_id),
+FOREIGN KEY (u_id) REFERENCES users(u_id),
+FOREIGN KEY (p_id) REFERENCES permissions(p_id),
 UNIQUE (login_name),
 UNIQUE (u_id)
 );
-INSERT INTO LOGIN(`login_name`,`login_pass`,`u_id`) values("harme","123654","1");
+INSERT INTO login(`login_name`,`login_pass`,`u_id`) values("harme","123654","1");
 
 
-CREATE TABLE TEAMS(
+CREATE TABLE teams(
 t_id INT AUTO_INCREMENT PRIMARY KEY,
 t_name VARCHAR(30) NOT NULL,
 t_chat_id VARCHAR(24) NOT NULL,
@@ -51,28 +51,28 @@ UNIQUE (t_name),
 UNIQUE (t_chat_id)
 );
 
-CREATE TABLE TEAM_USER(
+CREATE TABLE team_user(
 t_id INT,
 u_id INT,
-FOREIGN KEY (t_id) REFERENCES TEAMS(t_id),
-FOREIGN KEY (u_id) REFERENCES USERS(u_id)
+FOREIGN KEY (t_id) REFERENCES teams(t_id),
+FOREIGN KEY (u_id) REFERENCES users(u_id)
 );
 
-ALTER TABLE TEAM_USER
+ALTER TABLE team_user
 ADD CONSTRAINT pk_team_user PRIMARY KEY (t_id,u_id);
 
 
-CREATE TABLE CAMPUS(
+CREATE TABLE campus(
 c_id INT AUTO_INCREMENT PRIMARY KEY,
 c_name VARCHAR(30) NOT NULL,
 c_lat REAL,
 c_lng REAL
 );
 
-INSERT INTO CAMPUS(`c_name`,`c_lat`,`c_lng`) values("St. James Campus",43.6512279,-79.3693856),("Casa Loma Campus",43.6757552,-79.410208),("Waterfront Campus",43.643929,-79.367659);
+INSERT INTO campus(`c_name`,`c_lat`,`c_lng`) values("St. James Campus",43.6512279,-79.3693856),("Casa Loma Campus",43.6757552,-79.410208),("Waterfront Campus",43.643929,-79.367659);
 
 /*Changed but not added yet */
-CREATE TABLE DIC(
+CREATE TABLE dic(
 td_id INT AUTO_INCREMENT PRIMARY KEY,
 direction TEXT(1000),
 audio TEXT(1000),
@@ -81,132 +81,132 @@ td_lat REAL,
 td_lng REAL
 );
 
-CREATE TABLE TASK_DIC(
+CREATE TABLE task_dic(
 tsk_id INT,
 td_id INT,
-FOREIGN KEY (tsk_id) REFERENCES TASKS(tsk_id),
-FOREIGN KEY (td_id) REFERENCES DIC(td_id)
+FOREIGN KEY (tsk_id) REFERENCES tasks(tsk_id),
+FOREIGN KEY (td_id) REFERENCES dic(td_id)
 );
 
-ALTER TABLE TASK_QUESTION
+ALTER TABLE task_question
 ADD CONSTRAINT pk_task_dic PRIMARY KEY (tsk_id,td_id);
 /* Changes done until here*/
 
-CREATE TABLE TASKS(
+CREATE TABLE tasks(
 tsk_id INT AUTO_INCREMENT PRIMARY KEY,
 td_id INT,
 c_id INT,
-FOREIGN KEY (td_id) REFERENCES TASK_DIC(td_id),
-FOREIGN KEY (c_id) REFERENCES CAMPUS(c_id)
+FOREIGN KEY (td_id) REFERENCES task_dic(td_id),
+FOREIGN KEY (c_id) REFERENCES campus(c_id)
 );
 
-CREATE TABLE QUESTION_TYPE(
+CREATE TABLE question_type(
 q_typ_id INT AUTO_INCREMENT PRIMARY KEY,
 typ_desc TEXT(1000)
 );
 
-CREATE TABLE QUESTIONS(
+CREATE TABLE questions(
 q_id INT AUTO_INCREMENT PRIMARY KEY,
 q_typ_id INT,
 q_text TEXT(1000),
-FOREIGN KEY (q_typ_id) REFERENCES QUESTION_TYPE(q_typ_id)
+FOREIGN KEY (q_typ_id) REFERENCES question_type(q_typ_id)
 );
 
-CREATE TABLE ANSWERS(
+CREATE TABLE answers(
 a_id INT AUTO_INCREMENT PRIMARY KEY,
 q_id INT,
 answer TEXT(250),
-FOREIGN KEY (q_id) REFERENCES QUESTIONS(q_id)
+FOREIGN KEY (q_id) REFERENCES questions(q_id)
 );
 
 
-CREATE TABLE TASK_QUESTION(
+CREATE TABLE task_question(
 tsk_id INT,
 q_id INT,
-FOREIGN KEY (tsk_id) REFERENCES TASKS(tsk_id),
-FOREIGN KEY (q_id) REFERENCES QUESTIONS(q_id)
+FOREIGN KEY (tsk_id) REFERENCES tasks(tsk_id),
+FOREIGN KEY (q_id) REFERENCES questions(q_id)
 );
 
-ALTER TABLE TASK_QUESTION
+ALTER TABLE task_question
 ADD CONSTRAINT pk_task_question PRIMARY KEY (tsk_id,q_id);
 
 
-CREATE TABLE CLUE_TYPE(
+CREATE TABLE clue_type(
 clue_typ_id INT AUTO_INCREMENT PRIMARY KEY,
 typ_desc TEXT(1000)
 );
 
-CREATE TABLE CLUE(
+CREATE TABLE clue(
 clue_id INT AUTO_INCREMENT PRIMARY KEY,
 clue_typ_id INT,
 clue_text TEXT(1000),
 clue_audio TEXT(1000),
 clue_image TEXT(1000),
-FOREIGN KEY (clue_typ_id) REFERENCES CLUE_TYPE(clue_typ_id)
+FOREIGN KEY (clue_typ_id) REFERENCES clue_type(clue_typ_id)
 );
 
 
-CREATE TABLE CLUE_QUESTION(
+CREATE TABLE clue_question(
 clue_id INT,
 q_id INT,
-FOREIGN KEY (clue_id) REFERENCES CLUE(clue_id),
-FOREIGN KEY (q_id) REFERENCES QUESTIONS(q_id)
+FOREIGN KEY (clue_id) REFERENCES clue(clue_id),
+FOREIGN KEY (q_id) REFERENCES questions(q_id)
 );
 
-ALTER TABLE CLUE_QUESTION
+ALTER TABLE clue_question
 ADD CONSTRAINT pk_clue_question PRIMARY KEY (clue_id,q_id);
 
 
-CREATE TABLE GAME(
+CREATE TABLE game(
 g_id INT AUTO_INCREMENT PRIMARY KEY,
 start_time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 finis_time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL
 );
 
-CREATE TABLE TEAM_GAME(
+CREATE TABLE team_game(
 t_id INT,
 g_id INT,
-FOREIGN KEY (t_id) REFERENCES TEAMS(t_id),
-FOREIGN KEY (g_id) REFERENCES GAME(g_id)
+FOREIGN KEY (t_id) REFERENCES teams(t_id),
+FOREIGN KEY (g_id) REFERENCES game(g_id)
 );
 
-ALTER TABLE TEAM_GAME
+ALTER TABLE team_game
 ADD CONSTRAINT pk_team_game PRIMARY KEY (t_id,g_id);
 
 
-CREATE TABLE GAME_TASK(
+CREATE TABLE game_task(
 tsk_id INT,
 g_id INT,
 prv_tsk_id INT,
-FOREIGN KEY (tsk_id) REFERENCES TASKS(tsk_id),
-FOREIGN KEY (prv_tsk_id) REFERENCES TASKS(tsk_id),
-FOREIGN KEY (g_id) REFERENCES GAME(g_id)
+FOREIGN KEY (tsk_id) REFERENCES tasks(tsk_id),
+FOREIGN KEY (prv_tsk_id) REFERENCES tasks(tsk_id),
+FOREIGN KEY (g_id) REFERENCES game(g_id)
 );
 
-ALTER TABLE GAME_TASK
+ALTER TABLE game_task
 ADD CONSTRAINT pk_team_game PRIMARY KEY (tsk_id,g_id);
 
 
 
-CREATE TABLE PROGRESS(
+CREATE TABLE progress(
 t_id INT,
 u_id INT,
 tsk_id INT,
 status INT,
 currenttime TIMESTAMP,
-FOREIGN KEY (t_id) REFERENCES TEAMS(t_id),
-FOREIGN KEY (tsk_id) REFERENCES TASKS(tsk_id),
-FOREIGN KEY (u_id) REFERENCES USERS(u_id)
+FOREIGN KEY (t_id) REFERENCES teams(t_id),
+FOREIGN KEY (tsk_id) REFERENCES tasks(tsk_id),
+FOREIGN KEY (u_id) REFERENCES users(u_id)
 );
 
-CREATE TABLE RESPONSES(
+CREATE TABLE responses(
 r_id INT AUTO_INCREMENT PRIMARY KEY,
 t_id INT,
 u_id INT,
 tsk_id INT,
 response TEXT(1000),
 location TEXT(1000),
-FOREIGN KEY (t_id) REFERENCES TEAMS(t_id),
-FOREIGN KEY (tsk_id) REFERENCES TASKS(tsk_id),
-FOREIGN KEY (u_id) REFERENCES USERS(u_id)
+FOREIGN KEY (t_id) REFERENCES teams(t_id),
+FOREIGN KEY (tsk_id) REFERENCES tasks(tsk_id),
+FOREIGN KEY (u_id) REFERENCES users(u_id)
 );
