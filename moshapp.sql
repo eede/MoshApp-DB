@@ -1,3 +1,27 @@
+DROP TABLE IF EXISTS user_options;
+DROP TABLE IF EXISTS login;
+DROP TABLE IF EXISTS permissions;
+DROP TABLE IF EXISTS team_user;
+DROP TABLE IF EXISTS responses;
+DROP TABLE IF EXISTS progress;
+DROP TABLE IF EXISTS task_question;
+DROP TABLE IF EXISTS answers;
+DROP TABLE IF EXISTS clue_question;
+DROP TABLE IF EXISTS clue;
+DROP TABLE IF EXISTS questions;
+DROP TABLE IF EXISTS team_game;
+DROP TABLE IF EXISTS game_task;
+DROP TABLE IF EXISTS game;
+DROP TABLE IF EXISTS task_dic;
+DROP TABLE IF EXISTS tasks;
+DROP TABLE IF EXISTS dic;
+DROP TABLE IF EXISTS campus;
+DROP TABLE IF EXISTS teams;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS question_type;
+DROP TABLE IF EXISTS clue_type;
+
+
 CREATE TABLE users(
 u_id INT AUTO_INCREMENT PRIMARY KEY,
 u_nicknme VARCHAR(30) NOT NULL,
@@ -12,13 +36,13 @@ UNIQUE (s_num)
 INSERT INTO users(`u_nicknme`,`u_fname`,`u_lastname`,`u_email`,`u_phone`,`s_num`) values("TestUser","Test","Test","test@test.com","0000000000","000000000");
 
 /* Henuz eklenmedi */
-CREATE TABLE user_options{
+CREATE TABLE user_options(
 u_id INT,
 p_vsbl_tm TINYINT(1),
 e_vsbl_tm TINYINT(1),
 FOREIGN KEY (u_id) REFERENCES users(u_id),
 UNIQUE (u_id)
-}
+);
 
 
 CREATE TABLE permissions(
@@ -81,6 +105,15 @@ td_lat REAL,
 td_lng REAL
 );
 
+
+CREATE TABLE tasks(
+tsk_id INT AUTO_INCREMENT PRIMARY KEY,
+td_id INT,
+c_id INT,
+FOREIGN KEY (td_id) REFERENCES dic(td_id),
+FOREIGN KEY (c_id) REFERENCES campus(c_id)
+);
+
 CREATE TABLE task_dic(
 tsk_id INT,
 td_id INT,
@@ -88,17 +121,10 @@ FOREIGN KEY (tsk_id) REFERENCES tasks(tsk_id),
 FOREIGN KEY (td_id) REFERENCES dic(td_id)
 );
 
-ALTER TABLE task_question
+ALTER TABLE task_dic
 ADD CONSTRAINT pk_task_dic PRIMARY KEY (tsk_id,td_id);
 /* Changes done until here*/
 
-CREATE TABLE tasks(
-tsk_id INT AUTO_INCREMENT PRIMARY KEY,
-td_id INT,
-c_id INT,
-FOREIGN KEY (td_id) REFERENCES task_dic(td_id),
-FOREIGN KEY (c_id) REFERENCES campus(c_id)
-);
 
 CREATE TABLE question_type(
 q_typ_id INT AUTO_INCREMENT PRIMARY KEY,
