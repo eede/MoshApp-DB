@@ -56,7 +56,7 @@ INSERT INTO permissions values(0,"Regular user, can play game"),(1,"Master Admin
 
 CREATE TABLE login(
 login_name VARCHAR(30) NOT NULL,
-login_pass VARCHAR(34) NOT NULL,
+login_pass VARCHAR(64) NOT NULL,
 u_id INT,
 p_id INT DEFAULT 0,
 FOREIGN KEY (u_id) REFERENCES users(u_id),
