@@ -33,7 +33,6 @@ s_num VARCHAR(9) NOT NULL,
 UNIQUE (u_nicknme),
 UNIQUE (s_num)
 );
-INSERT INTO users(`u_nicknme`,`u_fname`,`u_lastname`,`u_email`,`u_phone`,`s_num`) values("TestUser","Test","Test","test@test.com","0000000000","000000000");
 
 /* Henuz eklenmedi */
 CREATE TABLE user_options(
@@ -50,9 +49,6 @@ p_id INT PRIMARY KEY,
 p_desc VARCHAR(100)
 );
 
-INSERT INTO permissions values(0,"Regular user, can play game"),(1,"Master Admin, has all the power ower game and players."),(2,"Editor, can change add new tasks and teams"),
-(3,"Admin, has ability that editor can do plus able to ban users"),(4,"Banned User");
-
 
 CREATE TABLE login(
 login_name VARCHAR(30) NOT NULL,
@@ -64,7 +60,6 @@ FOREIGN KEY (p_id) REFERENCES permissions(p_id),
 UNIQUE (login_name),
 UNIQUE (u_id)
 );
-INSERT INTO login(`login_name`,`login_pass`,`u_id`) values("harme","123654","1");
 
 
 CREATE TABLE teams(
@@ -92,8 +87,6 @@ c_name VARCHAR(30) NOT NULL,
 c_lat REAL,
 c_lng REAL
 );
-
-INSERT INTO campus(`c_name`,`c_lat`,`c_lng`) values("St. James Campus",43.6512279,-79.3693856),("Casa Loma Campus",43.6757552,-79.410208),("Waterfront Campus",43.643929,-79.367659);
 
 /*Changed but not added yet */
 CREATE TABLE dic(
