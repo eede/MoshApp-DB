@@ -54,24 +54,48 @@ INSERT INTO `team_user` (`t_id`, `u_id`) VALUES
 (2, 8);
 
 
-INSERT INTO dic(`direction`,`audio`,`image`,`td_lat`,`td_lng`) values("Same as audio","audiolocation.mp3","imagelocation.jsp",43.658965,-79.5647896),
-("Same as audio 1","audiolocation1.mp3","imagelocation1.jsp",43.657965,-79.5647896),("Same as audio2","audiolocation2.mp3","imagelocation2.jsp",43.658965,-79.5947896);
+INSERT INTO dic(`direction`,`audio`,`image`,`td_lat`,`td_lng`) VALUES
+("Same as audio", "audiolocation.mp3", "imagelocation.jsp", 43.658965, -79.5647896),
+("Same as audio 1", "audiolocation1.mp3", "imagelocation1.jsp", 43.657965, -79.5647896),
+("Same as audio2", "audiolocation2.mp3", "imagelocation2.jsp", 43.658965, -79.5947896);
 
-INSERT INTO tasks(`td_id`,`c_id`) values(1,3),(2,3),(3,3);
+INSERT INTO tasks(`td_id`,`c_id`) VALUES
+(1, 3),
+(2, 3),
+(3, 3);
 
-INSERT INTO task_dic values(1,1),(2,2),(3,3);
+INSERT INTO task_dic VALUES
+(1, 1),
+(2, 2),
+(3, 3);
 
-INSERT INTO question_type(`typ_desc`) values("Regular question answer type"),("Multichoice question type");
+INSERT INTO question_type(`typ_desc`) VALUES
+("Regular question answer type"),
+("Multichoice question type");
 
-INSERT INTO questions(`q_typ_id`,`q_text`) values(1,"task questin will be placed here 1"),(1,"task questin will be placed here 2"),(2,"task questin will be placed here 3");
+INSERT INTO questions(`q_typ_id`,`q_text`) VALUES
+(1, "task question will be placed here 1"),
+(1, "task question will be placed here 2"),
+(2, "task question will be placed here 3");
 
-INSERT INTO answers(`q_id`,`answer`) values(1,"test"),(2,"test1"),(3,"test,sky,ground");
+INSERT INTO answers(`q_id`,`answer`) VALUES
+(1, "test"),
+(2, "test1"),
+(3, "test,sky,ground");
 
-INSERT INTO task_question values(1,1),(2,2),(3,3);
+INSERT INTO task_question VALUES
+(1, 1),
+(2, 2),
+(3, 3);
 
-INSERT INTO game(`start_time`,`finis_time`) values('2013-1-28 13:15:23','2013-2-18 13:15:23');
+INSERT INTO game(`start_time`,`finis_time`) VALUES
+('2013-1-28 13:15:23', '2013-2-18 13:15:23');
 
-INSERT INTO team_game values(1,1),(2,1);
+INSERT INTO team_game VALUES
+(1, 1),
+(2, 1);
 
-INSERT INTO game_task(`tsk_id`,`g_id`) values(1,1),(2,1),(3,1);
-
+INSERT INTO game_task(`tsk_id`,`g_id`) VALUES
+(1, 1),
+(2, 1),
+(3, 1);
