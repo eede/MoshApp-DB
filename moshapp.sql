@@ -55,10 +55,13 @@ p_id INT PRIMARY KEY,
 p_desc VARCHAR(100)
 );
 
+<<<<<<< HEAD
 /* TEST DATA */
 INSERT INTO permissions values(0,"Regular user, can play game"),(1,"Master Admin, has all the power ower game and players."),(2,"Editor, can change add new tasks and teams"),
 (3,"Admin, has ability that editor can do plus able to ban users"),(4,"Banned User");
 
+=======
+>>>>>>> f8c97e77c6d4511dedd7665e60d4a4c5283712cb
 
 CREATE TABLE login(
 login_name VARCHAR(30) NOT NULL,
@@ -70,10 +73,13 @@ FOREIGN KEY (p_id) REFERENCES permissions(p_id),
 UNIQUE (login_name),
 UNIQUE (u_id)
 );
+<<<<<<< HEAD
 /* TEST DATA */
 INSERT INTO login(`login_name`,`login_pass`,`u_id`) values("harme","6460662E217C7A9F899208DD70A2C28ABDEA42F128666A9B78E6C0C064846493","1"),
 ("test","6460662E217C7A9F899208DD70A2C28ABDEA42F128666A9B78E6C0C064846493","2"),("test1","6460662E217C7A9F899208DD70A2C28ABDEA42F128666A9B78E6C0C064846493","3"),
 ("test2","6460662E217C7A9F899208DD70A2C28ABDEA42F128666A9B78E6C0C064846493","4"),("test3","6460662E217C7A9F899208DD70A2C28ABDEA42F128666A9B78E6C0C064846493","5");
+=======
+>>>>>>> f8c97e77c6d4511dedd7665e60d4a4c5283712cb
 
 
 CREATE TABLE teams(
@@ -106,10 +112,15 @@ c_name VARCHAR(30) NOT NULL,
 c_lat REAL,
 c_lng REAL
 );
+<<<<<<< HEAD
 /* TEST DATA */
 INSERT INTO campus(`c_name`,`c_lat`,`c_lng`) values("St. James Campus",43.6512279,-79.3693856),("Casa Loma Campus",43.6757552,-79.410208),("Waterfront Campus",43.643929,-79.367659);
 
 
+=======
+
+/*Changed but not added yet */
+>>>>>>> f8c97e77c6d4511dedd7665e60d4a4c5283712cb
 CREATE TABLE dic(
 td_id INT AUTO_INCREMENT PRIMARY KEY,
 direction TEXT(1000),
