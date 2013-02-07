@@ -52,7 +52,7 @@ p_desc VARCHAR(100)
 CREATE TABLE login(
 login_name VARCHAR(30) NOT NULL,
 login_pass VARCHAR(64) NOT NULL,
-u_id INT,
+u_id INT NOT NULL,
 p_id INT DEFAULT 0,
 FOREIGN KEY (u_id) REFERENCES users(u_id),
 FOREIGN KEY (p_id) REFERENCES permissions(p_id),
