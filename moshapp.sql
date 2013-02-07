@@ -120,6 +120,7 @@ typ_desc TEXT(1000)
 
 CREATE TABLE questions(
 q_id INT AUTO_INCREMENT PRIMARY KEY,
+q_secret_id varchar(30) UNIQUE not null,
 q_typ_id INT,
 q_text TEXT(1000),
 FOREIGN KEY (q_typ_id) REFERENCES question_type(q_typ_id)
