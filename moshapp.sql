@@ -30,7 +30,7 @@ u_lastname VARCHAR(30),
 u_email VARCHAR(100),
 u_phone VARCHAR(10),
 s_num VARCHAR(9) NOT NULL,
-UNIQUE (u_nicknme),
+UNIQUE (u_nickname),
 UNIQUE (s_num),
 UNIQUE (u_email)
 );
