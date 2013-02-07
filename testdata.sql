@@ -99,3 +99,9 @@ INSERT INTO game_task(`tsk_id`,`g_id`) VALUES
 (1, 1),
 (2, 1),
 (3, 1);
+
+INSERT INTO user_options(`u_id`,`p_vsbl_tm`,`e_vsbl_tm`) VALUES
+(0, 1, 0),
+(1, 0, 1),
+(2, 1, 1),
+(3, 0, 0);
