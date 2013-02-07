@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS clue_type;
 
 CREATE TABLE users(
 u_id INT AUTO_INCREMENT PRIMARY KEY,
-u_nicknme VARCHAR(30) NOT NULL,
+u_nickname VARCHAR(30) DEFAULT NULL,
 u_fname VARCHAR(30),
 u_lastname VARCHAR(30),
 u_email VARCHAR(100),
@@ -96,9 +96,8 @@ td_lng REAL
 
 CREATE TABLE tasks(
 tsk_id INT AUTO_INCREMENT PRIMARY KEY,
-td_id INT,
+tsk_name varchar(100),
 c_id INT,
-FOREIGN KEY (td_id) REFERENCES dic(td_id),
 FOREIGN KEY (c_id) REFERENCES campus(c_id)
 );
 
