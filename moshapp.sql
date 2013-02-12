@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS permissions;
 DROP TABLE IF EXISTS team_user;
 DROP TABLE IF EXISTS responses;
 DROP TABLE IF EXISTS progress;
-DROP TABLE IF EXISTS task_question;
+DROP TABLE IF EXISTS dic_question;
 DROP TABLE IF EXISTS answers;
 DROP TABLE IF EXISTS clue_question;
 DROP TABLE IF EXISTS clue;
@@ -37,8 +37,8 @@ UNIQUE (u_email)
 
 CREATE TABLE user_options(
 u_id INT,
-p_vsbl_tm TINYINT(1),
-e_vsbl_tm TINYINT(1),
+p_vsbl_tm TINYINT(1) DEFAULT 1,
+e_vsbl_tm TINYINT(1) DEFAULT 1,
 FOREIGN KEY (u_id) REFERENCES users(u_id),
 UNIQUE (u_id)
 );
@@ -97,6 +97,7 @@ td_lng REAL
 CREATE TABLE tasks(
 tsk_id INT AUTO_INCREMENT PRIMARY KEY,
 tsk_name varchar(100),
+secret_id varchar(30) UNIQUE not null,
 c_id INT,
 FOREIGN KEY (c_id) REFERENCES campus(c_id)
 );
@@ -120,7 +121,6 @@ typ_desc TEXT(1000)
 
 CREATE TABLE questions(
 q_id INT AUTO_INCREMENT PRIMARY KEY,
-q_secret_id varchar(30) UNIQUE not null,
 q_typ_id INT,
 q_text TEXT(1000),
 FOREIGN KEY (q_typ_id) REFERENCES question_type(q_typ_id)
@@ -135,15 +135,15 @@ FOREIGN KEY (q_id) REFERENCES questions(q_id)
 );
 
 
-CREATE TABLE task_question(
-tsk_id INT,
+CREATE TABLE dic_question(
+td_id INT,
 q_id INT,
-FOREIGN KEY (tsk_id) REFERENCES tasks(tsk_id),
+FOREIGN KEY (td_id) REFERENCES dic(td_id),
 FOREIGN KEY (q_id) REFERENCES questions(q_id)
 );
 
-ALTER TABLE task_question
-ADD CONSTRAINT pk_task_question PRIMARY KEY (tsk_id,q_id);
+ALTER TABLE dic_question
+ADD CONSTRAINT pk_dictionary_question PRIMARY KEY (td_id,q_id);
 
 
 CREATE TABLE clue_type(
@@ -213,14 +213,19 @@ FOREIGN KEY (tsk_id) REFERENCES tasks(tsk_id),
 FOREIGN KEY (u_id) REFERENCES users(u_id)
 );
 
+ALTER TABLE progress
+ADD CONSTRAINT pk_progress_rule UNIQUE (t_id,u_id,tsk_id,status);
+
 CREATE TABLE responses(
 r_id INT AUTO_INCREMENT PRIMARY KEY,
 t_id INT,
 u_id INT,
 tsk_id INT,
+q_id INT,
 response TEXT(1000),
 location TEXT(1000),
 FOREIGN KEY (t_id) REFERENCES teams(t_id),
 FOREIGN KEY (tsk_id) REFERENCES tasks(tsk_id),
-FOREIGN KEY (u_id) REFERENCES users(u_id)
+FOREIGN KEY (u_id) REFERENCES users(u_id),
+FOREIGN KEY (q_id) REFERENCES questions(q_id)
 );
