@@ -68,6 +68,17 @@ BEGIN
     TeamMember.User = UserId;
 END //
 
+DROP PROCEDURE IF EXISTS UpdateUserOption //
+CREATE PROCEDURE UpdateUserOption (IN UserId INT, IN PhoneVisible BOOLEAN, IN EmailVisible BOOLEAN)
+BEGIN
+  UPDATE user_options
+  SET
+    p_vsbl_tm = PhoneVisible,
+    e_vsbl_tm = EmailVisible
+  WHERE
+    u_id = UserId;
+END //
+
 DELIMITER ;
 
 COMMIT;
