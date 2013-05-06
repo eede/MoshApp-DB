@@ -1,15 +1,11 @@
 START TRANSACTION;
 
-DROP PROCEDURE IF EXISTS GetUser;
-DROP PROCEDURE IF EXISTS GetLoginUser;
-DROP PROCEDURE IF EXISTS GetTeam;
-DROP PROCEDURE IF EXISTS GetTeamWithUser;
-
 -- Stored Procedures
 DELIMITER //
 
 -- Retrieves user information, given a User ID
-CREATE PROCEDURE GetUser(IN UserId int(11))
+DROP PROCEDURE IF EXISTS GetUser //
+CREATE PROCEDURE GetUser(IN UserId INT)
 BEGIN
   SELECT
     users.*,
@@ -21,7 +17,8 @@ BEGIN
 END //
 
 -- Retrieves login and user information given their login name
-CREATE PROCEDURE GetLoginUser(IN LoginName varchar(30))
+DROP PROCEDURE IF EXISTS GetLoginUser //
+CREATE PROCEDURE GetLoginUser(IN LoginName VARCHAR(30))
 BEGIN
   SELECT
     users.*,
@@ -36,7 +33,8 @@ BEGIN
 END //
 
 -- Retrieves all information in a team, given a Team ID
-CREATE PROCEDURE GetTeam(IN TeamId int(11))
+DROP PROCEDURE IF EXISTS GetTeam //
+CREATE PROCEDURE GetTeam(IN TeamId INT)
 BEGIN
   SELECT
     teams.*, users.*, user_options.*
@@ -50,7 +48,8 @@ BEGIN
 END //
 
 -- Retrieves all information in a team, given a User ID
-CREATE PROCEDURE GetTeamWithUser(IN UserId int(11))
+DROP PROCEDURE IF EXISTS GetTeamWithUser //
+CREATE PROCEDURE GetTeamWithUser(IN UserId INT)
 BEGIN
   SELECT
     users.*, teams.*, user_options.*
