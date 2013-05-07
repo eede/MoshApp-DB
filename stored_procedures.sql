@@ -3,6 +3,27 @@ START TRANSACTION;
 -- Stored Procedures
 DELIMITER //
 
+-- Creates a new user
+DROP PROCEDURE IF EXISTS CreateUser //
+CREATE PROCEDURE CreateUser (IN FirstName VARCHAR(30), IN LastName VARCHAR(30), IN Email VARCHAR(100), IN Phone VARCHAR(10), IN StudentNumber VARCHAR(9), OUT UserId INT)
+BEGIN
+  INSERT INTO users(u_fname, u_lastname, u_email, u_phone, s_num) VALUES
+    (FirstName, LastName, Email, Phone, StudentNumber);
+
+  SET UserId = LAST_INSERT_ID();
+
+  INSERT INTO user_options VALUES
+    (UserId, TRUE, TRUE);
+END //
+
+-- Creates login credentials for a user
+DROP PROCEDURE IF EXISTS CreateLoginUser //
+CREATE PROCEDURE CreateLoginUser (IN UserId INT, IN LoginName VARCHAR(30), IN Password VARCHAR(64))
+BEGIN
+  INSERT INTO login(u_id, login_name, login_pass) VALUES
+    (UserId, LoginName, Password);
+END //
+
 -- Retrieves user information, given a User ID
 DROP PROCEDURE IF EXISTS GetUser //
 CREATE PROCEDURE GetUser(IN UserId INT)
@@ -68,6 +89,22 @@ BEGIN
     TeamMember.User = UserId;
 END //
 
+-- Checks if a given login name exists in the database, and if so, returns FALSE
+DROP FUNCTION IF EXISTS CheckLoginNameAvailable //
+CREATE FUNCTION CheckLoginNameAvailable(LoginName VARCHAR(30))
+RETURNS BOOLEAN
+BEGIN
+  DECLARE LNExists INT;
+  SELECT COUNT(login_name) INTO LNExists FROM login WHERE login_name = LoginName;
+
+  IF LNExists > 0 THEN
+    RETURN FALSE;
+  ELSE
+    RETURN TRUE;
+  END IF;
+END //
+
+-- Updates the given user's phone/email visibility options
 DROP PROCEDURE IF EXISTS UpdateUserOption //
 CREATE PROCEDURE UpdateUserOption (IN UserId INT, IN PhoneVisible BOOLEAN, IN EmailVisible BOOLEAN)
 BEGIN
