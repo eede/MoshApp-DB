@@ -149,6 +149,22 @@ BEGIN
   ORDER BY progress.status DESC;
 END //
 
+DROP PROCEDURE IF EXISTS GetTeamMemberDetails //
+CREATE PROCEDURE GetTeamMemberDetails (IN UserId INT)
+BEGIN
+  SELECT
+      u.u_nickname,
+      t.t_name,
+      tsk.tsk_name,
+      (SELECT MAX(p.status) FROM progress p WHERE p.tsk_id = tsk.tsk_id AND p.u_id = UserId) status,
+      (SELECT TIME_TO_SEC(TIMEDIFF(pf.currenttime, (SELECT ps.currenttime FROM progress ps WHERE ps.u_id = pf.u_id AND ps.tsk_id = pf.tsk_id AND ps.status = 1))) time_spent FROM progress pf WHERE pf.status = 2 AND pf.tsk_id = tsk.tsk_id AND pf.u_id = UserId) time_spent
+  FROM users u
+      INNER JOIN teams t ON t.t_id = (SELECT t_id FROM team_user WHERE u_id = UserId)
+      INNER JOIN game_task gt ON gt.g_id = (SELECT g_id FROM team_game tg WHERE tg.t_id = t.t_id)
+      INNER JOIN tasks tsk ON tsk.tsk_id = gt.tsk_id
+  WHERE u.u_id = UserId;
+END //
+
 DELIMITER ;
 
 COMMIT;
