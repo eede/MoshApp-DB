@@ -104,6 +104,10 @@ BEGIN
   END IF;
 END //
 
+-- ------------------------------------------------------ --
+-- Begin stored procedures taken from Emrah's PHP service --
+-- ------------------------------------------------------ --
+
 -- Updates the given user's phone/email visibility options
 DROP PROCEDURE IF EXISTS UpdateUserOption //
 CREATE PROCEDURE UpdateUserOption (IN UserId INT, IN PhoneVisible BOOLEAN, IN EmailVisible BOOLEAN)
@@ -182,6 +186,19 @@ BEGIN
       INNER JOIN team_user ON team_user.u_id = users.u_id
       INNER JOIN user_options ON user_options.u_id = users.u_id
   WHERE team_user.t_id = (SELECT t_id FROM team_user WHERE u_id = UserId) AND team_user.u_id != UserId;
+END //
+
+DROP PROCEDURE IF EXISTS GetTeams //
+CREATE PROCEDURE GetTeams ()
+BEGIN
+  SELECT
+    t.t_id,
+    t.t_name,
+    (SELECT COUNT(pc.tsk_id) FROM progress pc WHERE pc.u_id = pf.u_id AND pc.t_id = pf.t_id AND pc.status = 2) solved,
+    TIME_TO_SEC(TIMEDIFF(pf.currenttime, (SELECT ps.currenttime FROM progress ps WHERE ps.u_id = pf.u_id AND ps.tsk_id = pf.tsk_id AND ps.status = 1))) time_spent
+  FROM teams t
+    LEFT OUTER JOIN progress pf ON pf.status = 2 AND pf.t_id = t.t_id
+  ORDER BY t.t_name, solved, time_spent;
 END //
 
 DELIMITER ;
