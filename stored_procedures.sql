@@ -116,6 +116,39 @@ BEGIN
     u_id = UserId;
 END //
 
+DROP PROCEDURE IF EXISTS GetUserInitInfo //
+CREATE PROCEDURE GetUserInitInfo (IN UserId INT)
+BEGIN
+  SELECT
+    user_options.p_vsbl_tm, user_options.e_vsbl_tm,
+    teams.t_id, teams.t_name,
+    team_game.g_id,
+    game.start_time, game.finis_time,
+    tasks.tsk_id, tasks.tsk_name, tasks.secret_id,
+    campus.c_id, campus.c_name, campus.c_lat, campus.c_lng,
+    dic.td_id, dic.direction, dic.audio, dic.image, dic.td_lat, dic.td_lng,
+    questions.q_id, questions.q_typ_id, questions.q_text,
+    (SELECT MAX(progress.status) FROM progress WHERE progress.tsk_id = tasks.tsk_id AND progress.u_id = UserId) status,
+    responses.q_status,
+    answers.answer
+  FROM
+    tasks
+      LEFT OUTER JOIN campus       ON tasks.c_id = campus.c_id
+      LEFT OUTER JOIN task_dic     ON task_dic.tsk_id = tasks.tsk_id
+      LEFT OUTER JOIN dic          ON task_dic.td_id = dic.td_id
+      LEFT OUTER JOIN dic_question ON dic_question.td_id = dic.td_id
+      LEFT OUTER JOIN questions    ON dic_question.q_id = questions.q_id
+      INNER JOIN user_options      ON user_options.u_id = UserId
+      LEFT OUTER JOIN team_user    ON team_user.u_id = user_options.u_id
+      LEFT OUTER JOIN teams        ON teams.t_id = team_user.t_id
+      LEFT OUTER JOIN team_game    ON team_game.t_id = teams.t_id
+      LEFT OUTER JOIN game         ON game.g_id = team_game.g_id
+      LEFT OUTER JOIN progress     ON progress.status = 1 AND progress.u_id = UserId AND tasks.tsk_id = progress.tsk_id
+      LEFT OUTER JOIN responses    ON responses.q_id =questions.q_id AND responses.q_status = 1 AND responses.u_id = UserId
+      LEFT OUTER JOIN answers      ON answers.q_id = questions.q_id
+  ORDER BY progress.status DESC;
+END //
+
 DELIMITER ;
 
 COMMIT;
