@@ -165,6 +165,25 @@ BEGIN
   WHERE u.u_id = UserId;
 END //
 
+DROP PROCEDURE IF EXISTS GetContact //
+CREATE PROCEDURE GetContact (IN UserId INT)
+BEGIN
+  SELECT
+    users.u_id,
+    users.u_nickname,
+    users.u_fname,
+    users.u_lastname,
+    users.u_email,
+    users.u_phone,
+    user_options.p_vsbl_tm,
+    user_options.e_vsbl_tm
+  FROM
+    users
+      INNER JOIN team_user ON team_user.u_id = users.u_id
+      INNER JOIN user_options ON user_options.u_id = users.u_id
+  WHERE team_user.t_id = (SELECT t_id FROM team_user WHERE u_id = UserId) AND team_user.u_id != UserId;
+END //
+
 DELIMITER ;
 
 COMMIT;
