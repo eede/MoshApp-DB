@@ -219,6 +219,22 @@ BEGIN
   WHERE gt.g_id = GameId AND SYSDATE() < (SELECT finis_time FROM game WHERE g_id = GameId);
 END //
 
+DROP PROCEDURE IF EXISTS GetTaskDetail //
+CREATE PROCEDURE GetTaskDetail (IN TaskId INT)
+BEGIN
+  SELECT
+    tsk.tsk_name,
+    c.c_lat,
+    c.c_lng,
+    c.c_name,
+    td.td_id dictionary,
+    (SELECT COUNT(dq.td_id) FROM dic_question dq WHERE dq.td_id = td.td_id) questions
+  FROM
+    task_dic td
+      INNER JOIN tasks tsk ON td.tsk_id = tsk.tsk_id AND tsk.tsk_id = TaskId
+      INNER JOIN campus c ON c.c_id = tsk.c_id;
+END //
+
 DELIMITER ;
 
 COMMIT;
