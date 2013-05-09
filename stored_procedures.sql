@@ -235,6 +235,24 @@ BEGIN
       INNER JOIN campus c ON c.c_id = tsk.c_id;
 END //
 
+DROP PROCEDURE IF EXISTS GetTeamMembers //
+CREATE PROCEDURE GetTeamMembers (IN TeamId INT)
+BEGIN
+SELECT
+  t.t_name,
+  u.u_id,
+  u.u_nickname,
+  (SELECT SUM(TIME_TO_SEC(TIMEDIFF(pf.currenttime, (SELECT ps.currenttime FROM progress ps WHERE ps.u_id = pf.u_id AND ps.tsk_id = pf.tsk_id AND ps.status = 1)))) time_spent FROM progress pf WHERE pf.status = 2 AND pf.u_id = u.u_id) time_spent
+FROM
+  team_user tu
+    INNER JOIN users u ON u.u_id = tu.u_id
+    INNER JOIN teams t ON t.t_id = tu.t_id
+WHERE
+  tu.t_id = TeamId
+ORDER BY
+  time_spent;
+END //
+
 DELIMITER ;
 
 COMMIT;
