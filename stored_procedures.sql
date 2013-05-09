@@ -253,6 +253,13 @@ ORDER BY
   time_spent;
 END //
 
+DROP PROCEDURE IF EXISTS AcceptTask //
+CREATE PROCEDURE AcceptTask (IN TeamId INT, IN TaskId INT, IN UserId INT, IN Status INT)
+BEGIN
+  INSERT INTO progress(t_id, u_id, tsk_id, status) VALUES
+    (TeamId, UserId, TaskId, Status);
+END //
+
 DELIMITER ;
 
 COMMIT;
