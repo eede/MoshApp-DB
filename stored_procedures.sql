@@ -201,6 +201,24 @@ BEGIN
   ORDER BY t.t_name, solved, time_spent;
 END //
 
+DROP PROCEDURE IF EXISTS GetAllAvailableTasks //
+CREATE PROCEDURE GetAllAvailableTasks (IN UserId INT, IN GameId INT)
+BEGIN
+  SELECT
+    gt.prv_tsk_id,
+    tsk.tsk_id,
+    (SELECT MAX(p.status) FROM progress p WHERE p.tsk_id = tsk.tsk_id AND p.u_id = UserId) status,
+    tsk.tsk_name,
+    c.c_id,
+    c.c_name,
+    c.c_lat,
+    c.c_lng
+  FROM tasks tsk
+    INNER JOIN game_task gt ON tsk.tsk_id = gt.tsk_id
+    INNER JOIN campus c ON c.c_id = tsk.c_id
+  WHERE gt.g_id = GameId AND SYSDATE() < (SELECT finis_time FROM game WHERE g_id = GameId);
+END //
+
 DELIMITER ;
 
 COMMIT;
