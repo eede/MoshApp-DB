@@ -202,7 +202,7 @@ BEGIN
 END //
 
 DROP PROCEDURE IF EXISTS GetAllAvailableTasks //
-CREATE PROCEDURE GetAllAvailableTasks (IN TeamId INT, IN GameId INT)
+CREATE PROCEDURE GetAllAvailableTasks (IN TeamId INT, IN UserId INT, IN GameId INT)
 BEGIN
   SELECT
     gt.prv_tsk_id,
@@ -320,7 +320,7 @@ BEGIN
 
   -- Check if the question has already been answered, and if so, return code 100
   IF (SELECT COUNT(*) FROM responses WHERE t_id = TeamId AND u_id = UserId AND tsk_id = TaskId AND q_id = QuestionId AND q_status = 1) > 0 THEN
-    SELECT 100;
+    SELECT "100";
     SET _done = TRUE;
   END IF;
 
@@ -365,25 +365,22 @@ BEGIN
             IF _tasksdone = _noftasks THEN
               -- Number of tasks completed is the same as the number of tasks? Congratulations, the player has completed the game!
               IF _done = FALSE THEN SELECT "gamecomplete"; SET _done = TRUE; END IF;
-            ELSE
-              -- We haven't yet finished the game, but this task has been completed.
-              IF _done = FALSE THEN SELECT "taskcomplete"; SET _done = TRUE; END IF;
             END IF;
-          ELSE
-            -- Nothing was found above? This team probably just started the game.
-            IF _done = FALSE THEN SELECT "taskcomplete"; SET _done = TRUE; END IF;
           END IF;
+          IF _done = FALSE THEN SELECT "taskcomplete"; SET _done = TRUE; END IF;
         ELSE
-          -- The solved question does not match the current task, so return false.
-          IF _done = FALSE THEN SELECT FALSE; SET _done = TRUE; END IF;
+          -- The question was correct, but the task is not complete
+          IF _done = FALSE THEN SELECT "1"; SET _done = TRUE; END IF;
         END IF;
       END IF;
+      IF _done = FALSE THEN SELECT "1"; SET _done = TRUE; END IF;
+    ELSE
+      IF _done = FALSE THEN SELECT "0"; SET _done = TRUE; END IF;
     END IF;
-    -- Answer was wrong, return false.
-    IF _done = FALSE THEN SELECT FALSE; SET _done = TRUE; END IF;
   END IF;
 
   -- And we're done! Whew.
+  COMMIT;
 END //
 
 DELIMITER ;
