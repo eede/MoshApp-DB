@@ -379,6 +379,11 @@ BEGIN
     END IF;
   END IF;
 
+  -- Close all cursors
+  CLOSE _updateCur;
+  CLOSE _solvedCur;
+  CLOSE _answerCur;
+
   -- And we're done! Whew.
   COMMIT;
 END //
