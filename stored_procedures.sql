@@ -202,21 +202,25 @@ BEGIN
 END //
 
 DROP PROCEDURE IF EXISTS GetAllAvailableTasks //
-CREATE PROCEDURE GetAllAvailableTasks (IN UserId INT, IN GameId INT)
+CREATE PROCEDURE GetAllAvailableTasks (IN TeamId INT, IN GameId INT)
 BEGIN
   SELECT
     gt.prv_tsk_id,
     tsk.tsk_id,
-    (SELECT MAX(p.status) FROM progress p WHERE p.tsk_id = tsk.tsk_id AND p.u_id = UserId) status,
+    (SELECT MAX(p.status) FROM progress p WHERE p.tsk_id = tsk.tsk_id AND p.t_id = TeamId) status,
+    (SELECT u_nickname FROM users WHERE u_id = (SELECT u_id FROM progress p WHERE p.tsk_id = tsk.tsk_id AND p.status = 1 AND p.t_id = TeamId)) user,
     tsk.tsk_name,
     c.c_id,
     c.c_name,
     c.c_lat,
     c.c_lng
-  FROM tasks tsk
-    INNER JOIN game_task gt ON tsk.tsk_id = gt.tsk_id
-    INNER JOIN campus c ON c.c_id = tsk.c_id
-  WHERE gt.g_id = GameId AND SYSDATE() < (SELECT finis_time FROM game WHERE g_id = GameId);
+  FROM
+    tasks tsk
+      INNER JOIN game_task gt ON tsk.tsk_id = gt.tsk_id
+      INNER JOIN campus c ON c.c_id = tsk.c_id
+  WHERE
+    gt.g_id = GameId AND
+    SYSDATE() < (SELECT finis_time FROM game WHERE g_id = GameId);
 END //
 
 DROP PROCEDURE IF EXISTS GetTaskDetail //
