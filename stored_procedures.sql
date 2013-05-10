@@ -202,21 +202,25 @@ BEGIN
 END //
 
 DROP PROCEDURE IF EXISTS GetAllAvailableTasks //
-CREATE PROCEDURE GetAllAvailableTasks (IN UserId INT, IN GameId INT)
+CREATE PROCEDURE GetAllAvailableTasks (IN TeamId INT, IN UserId INT, IN GameId INT)
 BEGIN
   SELECT
     gt.prv_tsk_id,
     tsk.tsk_id,
-    (SELECT MAX(p.status) FROM progress p WHERE p.tsk_id = tsk.tsk_id AND p.u_id = UserId) status,
+    (SELECT MAX(p.status) FROM progress p WHERE p.tsk_id = tsk.tsk_id AND p.t_id = TeamId) status,
+    (SELECT u_nickname FROM users WHERE u_id = (SELECT u_id FROM progress p WHERE p.tsk_id = tsk.tsk_id AND p.status = 1 AND p.t_id = TeamId)) user,
     tsk.tsk_name,
     c.c_id,
     c.c_name,
     c.c_lat,
     c.c_lng
-  FROM tasks tsk
-    INNER JOIN game_task gt ON tsk.tsk_id = gt.tsk_id
-    INNER JOIN campus c ON c.c_id = tsk.c_id
-  WHERE gt.g_id = GameId AND SYSDATE() < (SELECT finis_time FROM game WHERE g_id = GameId);
+  FROM
+    tasks tsk
+      INNER JOIN game_task gt ON tsk.tsk_id = gt.tsk_id
+      INNER JOIN campus c ON c.c_id = tsk.c_id
+  WHERE
+    gt.g_id = GameId AND
+    SYSDATE() < (SELECT finis_time FROM game WHERE g_id = GameId);
 END //
 
 DROP PROCEDURE IF EXISTS GetTaskDetail //
@@ -258,6 +262,130 @@ CREATE PROCEDURE AcceptTask (IN TeamId INT, IN TaskId INT, IN UserId INT, IN Sta
 BEGIN
   INSERT INTO progress(t_id, u_id, tsk_id, status) VALUES
     (TeamId, UserId, TaskId, Status);
+END //
+
+DROP PROCEDURE IF EXISTS InsertResponse //
+CREATE PROCEDURE InsertResponse (IN TeamId INT, IN UserId INT, IN TaskId INT, IN QuestionId INT, IN UResponse VARCHAR(150), IN ULocation TEXT)
+BEGIN
+  -- Declare variables
+  DECLARE ResponseId INT;
+  DECLARE _done BOOLEAN DEFAULT FALSE;
+
+  -- Declare cursors and helper variables
+  DECLARE _numberOfRows INT;
+
+  -- Helper variables for _solvedCur
+  DECLARE _solvedquestion INT;
+  DECLARE _tskquestion INT;
+
+  -- Helper variables for _updateCur
+  DECLARE _tasksdone INT;
+  DECLARE _noftasks INT;
+
+  -- Cursor for checking answers
+  DECLARE _answerCur CURSOR FOR
+    SELECT
+      *
+    FROM
+      answers
+    WHERE
+      q_id = QuestionId AND
+      ((answer IS NULL) OR (LOWER(answer) = (SELECT LOWER(response) FROM responses WHERE r_id = ResponseId)));
+
+  -- Cursor for checking solved question
+  DECLARE _solvedCur CURSOR FOR
+    SELECT
+      COUNT(q_status) solvedquestion,
+      (SELECT SUM(questions) FROM (SELECT (SELECT COUNT(dq.td_id) FROM dic_question dq WHERE dq.td_id = td.td_id) questions FROM task_dic td WHERE td.tsk_id = TaskId) AS A) tskquestion
+    FROM
+      responses
+    WHERE
+      q_status = 1 AND
+      tsk_id = TaskId AND
+      u_id = UserId;
+
+  -- Cursor for updating progress table on solved questions
+  DECLARE _updateCur CURSOR FOR
+    SELECT
+      COUNT(u_id) tasksdone,
+      (SELECT COUNT(g_id) FROM game_task WHERE g_id = (SELECT g_id FROM team_game WHERE t_id = TeamId)) noftasks
+    FROM
+      progress
+    WHERE
+      status = 2 AND
+      u_id = UserId;
+
+  -- Start actual query
+  START TRANSACTION;
+
+  -- Check if the question has already been answered, and if so, return code 100
+  IF (SELECT COUNT(*) FROM responses WHERE t_id = TeamId AND u_id = UserId AND tsk_id = TaskId AND q_id = QuestionId AND q_status = 1) > 0 THEN
+    SELECT "100";
+    SET _done = TRUE;
+  END IF;
+
+  IF _done = FALSE THEN
+    -- Add the user's response to the database
+    INSERT INTO responses(t_id, u_id, tsk_id, q_id, response, location)
+      VALUES (TeamId, UserId, TaskId, QuestionId, UResponse, ULocation);
+
+    SET ResponseId = LAST_INSERT_ID();
+
+    -- Check the database for the correct answer
+    OPEN _answerCur;
+    SELECT FOUND_ROWS() INTO _numberOfRows;
+
+    -- If the answer was correct, there will be at least 1 row. Otherwise, there will be nothing.
+    IF _numberOfRows > 0 THEN
+      UPDATE responses SET q_status = 1 WHERE r_id = ResponseId;
+
+      -- Check the database for the question that was answered
+      OPEN _solvedCur;
+      SELECT FOUND_ROWS() INTO _numberOfRows;
+
+      IF _numberOfRows > 0 THEN
+        FETCH _solvedCur INTO _solvedquestion, _tskquestion;
+
+        -- If the question that was solved matches the current task, mark it as answered so that the player can progress through the game.
+        IF _solvedquestion = _tskquestion THEN
+          INSERT INTO progress(t_id, u_id, tsk_id, status) VALUES (
+            TeamId,
+            UserId,
+            (SELECT p.tsk_id FROM progress p WHERE p.u_id = UserId AND p.currenttime = (SELECT MAX(pr.currenttime) FROM progress pr WHERE pr.u_id = UserId)),
+            2
+          );
+
+          -- Check if the player has completed all of the current game's tasks
+          OPEN _updateCur;
+          SELECT FOUND_ROWS() INTO _numberOfRows;
+
+          IF _numberOfRows > 0 THEN
+            FETCH _updateCur INTO _tasksdone, _noftasks;
+
+            IF _tasksdone = _noftasks THEN
+              -- Number of tasks completed is the same as the number of tasks? Congratulations, the player has completed the game!
+              IF _done = FALSE THEN SELECT "gamecomplete"; SET _done = TRUE; END IF;
+            END IF;
+          END IF;
+          IF _done = FALSE THEN SELECT "taskcomplete"; SET _done = TRUE; END IF;
+        ELSE
+          -- The question was correct, but the task is not complete
+          IF _done = FALSE THEN SELECT "1"; SET _done = TRUE; END IF;
+        END IF;
+      END IF;
+      IF _done = FALSE THEN SELECT "1"; SET _done = TRUE; END IF;
+    ELSE
+      IF _done = FALSE THEN SELECT "0"; SET _done = TRUE; END IF;
+    END IF;
+  END IF;
+
+  -- Close all cursors
+  CLOSE _updateCur;
+  CLOSE _solvedCur;
+  CLOSE _answerCur;
+
+  -- And we're done! Whew.
+  COMMIT;
 END //
 
 DELIMITER ;
